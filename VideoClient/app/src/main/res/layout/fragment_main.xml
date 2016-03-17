@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <include layout="@layout/actionbar_custom"/>
+    <Button
+        android:id="@+id/btn_video_rt_upload"
+        style="@style/common_btn"
+        android:layout_width="match_parent"
+        android:text="@string/video_rt_upload"
+        />
+    <Button
+        android:id="@+id/btn_video_rt_monitor"
+        style="@style/common_btn"
+        android:layout_width="match_parent"
+        android:text="@string/video_rt_monitor"
+        />
+    <Button
+        android:id="@+id/btn_photo_capture_upload"
+        style="@style/common_btn"
+        android:layout_width="match_parent"
+        android:text="@string/photo_capture_upload"
+        />
+    <Button
+        android:id="@+id/btn_video_recorder_upload"
+        style="@style/common_btn"
+        android:layout_width="match_parent"
+        android:text="@string/video_recorder_upload"
+        />
+</LinearLayout>
