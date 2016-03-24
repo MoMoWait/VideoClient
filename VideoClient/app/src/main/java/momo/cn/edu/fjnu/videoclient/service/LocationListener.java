@@ -13,14 +13,16 @@ public class LocationListener implements AMapLocationListener{
     public static final String TAG = LocationListener.class.getSimpleName();
     @Override
     public void onLocationChanged(AMapLocation aMapLocation) {
+
         if(aMapLocation != null && aMapLocation.getErrorCode() == 0){
             LocationService.lat = aMapLocation.getLatitude();
             LocationService.lng = aMapLocation.getLongitude();
             LocationService.address = aMapLocation.getAddress();
-            Log.i(TAG, "经度:" + LocationService.lat);
-            Log.i(TAG, "纬度:" + LocationService.lat);
+            Log.i(TAG, "经度:" + LocationService.lng);
+            Log.i(TAG, "纬度:" + LocationService.lng);
             Log.i(TAG, "位置:" + LocationService.address);
         }else{
+            Log.i(TAG, "定位失败:" + (aMapLocation == null? "": aMapLocation.getErrorCode())+ ":" + (aMapLocation == null? "定位失败": aMapLocation.getErrorInfo()));
             //定位失败,恢复初始值
             LocationService.initValue();
         }

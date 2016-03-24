@@ -26,11 +26,11 @@ import java.util.List;
 import momo.cn.edu.fjnu.androidutils.base.BaseFragment;
 import momo.cn.edu.fjnu.androidutils.utils.ResourceUtils;
 import momo.cn.edu.fjnu.videoclient.R;
-import momo.cn.edu.fjnu.videoclient.activity.VideoRtMonitorActivity;
 import momo.cn.edu.fjnu.videoclient.adapter.AllUsersAdapter;
 import momo.cn.edu.fjnu.videoclient.data.AppConst;
 import momo.cn.edu.fjnu.videoclient.exception.AppException;
 import momo.cn.edu.fjnu.videoclient.model.net.GetAllUserTask;
+import momo.cn.edu.fjnu.vlclib.activity.PlayerActivity;
 
 
 /**
@@ -99,11 +99,17 @@ public class AllUsersFragment extends BaseFragment {
         mListAllUsers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getContext(), VideoRtMonitorActivity.class);
+             /*   Intent intent = new Intent(getContext(), VideoRtMonitorActivity.class);
                 try{
-                    //PlayerActivity
                     JSONObject jsonObject = new JSONObject(parent.getAdapter().getItem(position).toString());
-                    intent.putExtra(AppConst.USER_ID, "" + jsonObject.getInt("id"));
+                    intent.putExtra(AppConst.USER_ID,  jsonObject.getInt("id"));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }*/
+                Intent intent = new Intent(getContext(), PlayerActivity.class);
+                try{
+                    JSONObject jsonObject = new JSONObject(parent.getAdapter().getItem(position).toString());
+                    intent.putExtra(AppConst.VIDEO_URL,AppConst.RTSP_HEAD +  jsonObject.getInt("id"));
                 }catch (Exception e){
                     e.printStackTrace();
                 }

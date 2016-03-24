@@ -37,6 +37,7 @@ import momo.cn.edu.fjnu.videoclient.data.AppConst;
 import momo.cn.edu.fjnu.videoclient.data.SharedKeys;
 import momo.cn.edu.fjnu.videoclient.exception.AppException;
 import momo.cn.edu.fjnu.videoclient.model.net.FileUploadTask;
+import momo.cn.edu.fjnu.videoclient.service.LocationService;
 
 /**
  * 主目录页面
@@ -175,7 +176,7 @@ public class MainFragment extends BaseFragment{
                 AjaxCallback.setTimeout(AppConst.DEFAULT_UPLOAD_TIME);
             }
         }).execute(StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USERID), "" + AppConst.FileType.PHOTO, "" + saveScaleFile.length() / 1024,
-                saveScaleFile.getAbsolutePath());
+                saveScaleFile.getAbsolutePath(), "" + LocationService.lng, "" + LocationService.lat, LocationService.address);
     }
 
     @Override
@@ -198,7 +199,7 @@ public class MainFragment extends BaseFragment{
                     AjaxCallback.setTimeout(AppConst.DEFAULT_UPLOAD_TIME);
                 }
             }).execute(StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USERID), "" + AppConst.FileType.VIDEO, "" + videoFile.length() / 1024,
-                    videoFile.getAbsolutePath());
+                    videoFile.getAbsolutePath(), "" + LocationService.lng, "" +LocationService.lat, LocationService.address);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

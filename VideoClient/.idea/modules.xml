@@ -5,7 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/VideoClient.iml" filepath="$PROJECT_DIR$/VideoClient.iml" />
       <module fileurl="file://$PROJECT_DIR$/androidutils/androidutils.iml" filepath="$PROJECT_DIR$/androidutils/androidutils.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/vlc/vlc.iml" filepath="$PROJECT_DIR$/vlc/vlc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vlclib/vlclib.iml" filepath="$PROJECT_DIR$/vlclib/vlclib.iml" />
     </modules>
   </component>
 </project>

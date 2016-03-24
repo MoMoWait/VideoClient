@@ -16,7 +16,7 @@ public class AppConst {
     /**定位间隔时间*/
     public static final long LOCATE_TIME = 60L * 1000;
     /**请求的URl地址前缀*/
-    public static final String URL_HEAD = "http://192.168.1.203:8080/VideoAppService/";
+    public static final String URL_HEAD = "http://172.17.200.1:8080/VideoAppService/";
     /**RTSP流的前缀*/
     public static final String RTSP_HEAD = "rtsp://120.24.210.186:1935/VideoControl/";
     /**图片存储目录*/
@@ -45,6 +45,8 @@ public class AppConst {
     public static final int SERVER_PORT = 1935;
     /**VideoMonitor Application*/
     public static final String VIDEO_MONITOR = "VideoControl";
+    /**视频流的URL*/
+    public static final String VIDEO_URL = "video_url";
     /**
      * 请求结果
      */

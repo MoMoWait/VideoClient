@@ -38,6 +38,9 @@ public class FileUploadTask extends AsyncTask<String, Integer, Integer>{
         reqParams.put("type", params[1]);
         reqParams.put("file_size", params[2]);
         reqParams.put("file", new File(params[3]));
+        reqParams.put("lng", params[4]);
+        reqParams.put("lat", params[5]);
+        reqParams.put("address", params[6]);
         try {
             mJsonResult = NetService.request("FileUploadService", reqParams);
         } catch (AppException e) {

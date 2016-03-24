@@ -6,14 +6,14 @@ package momo.cn.edu.fjnu.videoclient.service;
  */
 public class LocationService {
     /**经度*/
-    public static double lng = Integer.MIN_VALUE;
+    public static double lng  = 0;
     /**纬度*/
-    public static double lat = Integer.MIN_VALUE;
+    public static double lat = 0;
     /**位置信息*/
     public static String address = "";
 
     public static void initValue(){
-        lng = lat = Integer.MIN_VALUE;
+        lng = lat = 0;
         address = "";
     }
 
