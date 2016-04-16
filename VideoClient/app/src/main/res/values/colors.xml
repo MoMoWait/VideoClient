@@ -74,7 +74,8 @@
     <color name="gray_4c">#4c4c4c</color>
     <color name="sub_main_maroom">#999999</color>
     <color name="half_black">#55000000</color>
-
+    <color name="grid_state_pressed">#1Affffff</color>
+    <color name="grid_state_focused">#80000000</color>
     <!-- 操作栏背景颜色 -->
     <color name="actionbar_background">#f6f6f6</color>
     <!-- fragment背景颜色 -->

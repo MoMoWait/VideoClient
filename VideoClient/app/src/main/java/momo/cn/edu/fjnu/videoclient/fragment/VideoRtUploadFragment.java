@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -20,6 +21,7 @@ import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
 import net.majorkernelpanic.streaming.video.VideoQuality;
 
+import org.json.JSONObject;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
@@ -35,7 +37,11 @@ import momo.cn.edu.fjnu.androidutils.utils.ValidUtils;
 import momo.cn.edu.fjnu.videoclient.R;
 import momo.cn.edu.fjnu.videoclient.data.AppConst;
 import momo.cn.edu.fjnu.videoclient.data.SharedKeys;
+import momo.cn.edu.fjnu.videoclient.exception.AppException;
+import momo.cn.edu.fjnu.videoclient.model.net.RegisterOnlineTask;
+import momo.cn.edu.fjnu.videoclient.model.net.RequestOfflineTask;
 import momo.cn.edu.fjnu.videoclient.pojo.CameraSize;
+import momo.cn.edu.fjnu.videoclient.service.LocationService;
 import momo.cn.edu.fjnu.videoclient.view.VideoServerDialog;
 import momo.cn.edu.fjnu.videoclient.view.VideoSettingDialog;
 
@@ -70,8 +76,7 @@ public class VideoRtUploadFragment extends BaseFragment implements
     private RtspClient mClient;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return x.view().inject(this, inflater, container);
     }
 
@@ -79,16 +84,8 @@ public class VideoRtUploadFragment extends BaseFragment implements
     @Override
     public void initView() {
         mButtonFlash.setTag("off");
-        //打开后置摄像头
-        Camera camera = Camera.open();
-        Camera.Parameters parameters = camera.getParameters();
-        List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
-        List<CameraSize> cameraSizes = new ArrayList<>();
-        for(Camera.Size size : supportedPreviewSizes){
-            cameraSizes.add(new CameraSize(size.width, size.height));
-        }
-        StorageUtils.saveDataToSharedPreference(SharedKeys.CAMERA_SIZES, JsonUtils.listToJsonArray(cameraSizes).toString());
-        camera.release();
+
+
 
     }
 
@@ -102,7 +99,7 @@ public class VideoRtUploadFragment extends BaseFragment implements
                 .setSurfaceView(mSurfaceView)
                 .setPreviewOrientation(0)
                 .setCallback(this)
-                .setTimeToLive(25)
+                .setTimeToLive(75)
                 .build();
 
         // Configures the RTSP client
@@ -110,6 +107,20 @@ public class VideoRtUploadFragment extends BaseFragment implements
         mClient.setSession(mSession);
         mClient.setCallback(this);
         mSurfaceView.getHolder().addCallback(this);
+
+        //获取设备摄像头的一些信息
+        if(ValidUtils.isEmpty(StorageUtils.getDataFromSharedPreference(SharedKeys.CAMERA_SIZES))){
+            //打开后置摄像头
+            Camera camera = Camera.open();
+            Camera.Parameters parameters = camera.getParameters();
+            List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
+            List<CameraSize> cameraSizes = new ArrayList<>();
+            for(Camera.Size size : supportedPreviewSizes){
+                cameraSizes.add(new CameraSize(size.width, size.height));
+            }
+            StorageUtils.saveDataToSharedPreference(SharedKeys.CAMERA_SIZES, JsonUtils.listToJsonArray(cameraSizes).toString());
+            camera.release();
+        }
     }
 
 
@@ -181,13 +192,22 @@ public class VideoRtUploadFragment extends BaseFragment implements
             }
             mClient.setCredentials(serverUserName, serverPassword);
             mClient.setServerAddress(serverIp, AppConst.SERVER_PORT);
-            mClient.setStreamPath("/" + AppConst.VIDEO_MONITOR + "/" + StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USERID));
-            //尝试使用TCP模式
-            mClient.setTransportMode(RtspClient.TRANSPORT_TCP);
+            String userInfo = StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USER_INFO);
+            String userId = "-1";
+            try {
+                JSONObject userObject = new JSONObject(userInfo);
+                userId =  userObject.getString("id");
+            }catch (Exception e){
+
+            }
+            mClient.setStreamPath("/" + AppConst.VIDEO_MONITOR + "/" + userId);
+            //尝试使用UDP模式
+            mClient.setTransportMode(RtspClient.TRANSPORT_UDP);
             //设置视频质量
             selectQuality();
             //显示环形进度条
             mProgressBar.setVisibility(View.VISIBLE);
+            //开始捕获视频流并且发送
             mClient.startStream();
 
         } else {
@@ -233,6 +253,28 @@ public class VideoRtUploadFragment extends BaseFragment implements
         enableUI();
         mButtonStart.setImageResource(R.mipmap.ic_switch_video_active);
         mProgressBar.setVisibility(View.GONE);
+        //获取当前用户信息
+        String userInfo = StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USER_INFO);
+        String userId = String.valueOf(-1);
+        try {
+            JSONObject userObject = new JSONObject(userInfo);
+            userId = userObject.getString("id");
+        }catch (Exception e){
+            Log.i(TAG, "" + e);
+        }
+        Log.i(TAG, "RTSP回话开始");
+        //尝试注册在线
+        new RegisterOnlineTask(new RegisterOnlineTask.CallBack() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+
+            }
+
+            @Override
+            public void onFailed(AppException exception) {
+
+            }
+        }).execute(userId, LocationService.address, "" + LocationService.lng, "" + LocationService.lat);
     }
 
     @Override
@@ -240,6 +282,28 @@ public class VideoRtUploadFragment extends BaseFragment implements
         enableUI();
         mButtonStart.setImageResource(R.mipmap.ic_switch_video);
         mProgressBar.setVisibility(View.GONE);
+        Log.i(TAG, "RTSP回话开始");
+        //获取当前用户信息
+        String userInfo = StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USER_INFO);
+        String userId = String.valueOf(-1);
+        try {
+            JSONObject userObject = new JSONObject(userInfo);
+            userId = userObject.getString("id");
+        }catch (Exception e){
+            Log.i(TAG, "" + e);
+        }
+        //请求下线
+        new RequestOfflineTask(new RequestOfflineTask.CallBack() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+
+            }
+
+            @Override
+            public void onFailed(AppException exception) {
+
+            }
+        }).execute(userId);
     }
 
     @Override

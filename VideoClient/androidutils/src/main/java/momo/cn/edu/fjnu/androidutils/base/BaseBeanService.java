@@ -29,14 +29,14 @@ public interface BaseBeanService <T>{
      * 获取所有数据
      * @return
      */
-    List<T> getAll();
+    List<T> getAll(Class<T> tClass);
 
     /**
      * 通过主键获取对象
      * @param id
      * @return
      */
-    T getObjectById(Object id);
+    T getObjectById(Class<T> tClass, Object id);
 
     /**
      * 判断某个对象是否存在
@@ -56,4 +56,10 @@ public interface BaseBeanService <T>{
      * @param objects
      */
     void updateAll(List<T> objects);
+
+    /**
+     * 保存或更新列表
+     * @param objects
+     */
+    void saveOrUpdateAll(List<T> objects);
 }

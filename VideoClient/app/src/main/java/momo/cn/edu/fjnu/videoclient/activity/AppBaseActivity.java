@@ -1,14 +1,12 @@
 package momo.cn.edu.fjnu.videoclient.activity;
 
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.view.KeyEvent;
 
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 
 import momo.cn.edu.fjnu.androidutils.base.BaseActivity;
-import momo.cn.edu.fjnu.androidutils.utils.ResourceUtils;
 import momo.cn.edu.fjnu.videoclient.R;
 import momo.cn.edu.fjnu.videoclient.data.AppConst;
 import momo.cn.edu.fjnu.videoclient.service.LocationListener;
@@ -30,8 +28,6 @@ public class AppBaseActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //初始化操作栏
-        initActionBar();
         //初始化定位
         initLocation();
     }
@@ -81,19 +77,13 @@ public class AppBaseActivity extends BaseActivity {
         mLocationClient.setLocationListener(new LocationListener());
     }
 
-    /**
-     * 初始化操作栏
-     */
-    public void initActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null){
-            //设置操作栏的背景颜色
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            //设置操作栏的布局
-            actionBar.setCustomView(R.layout.actionbar_custom);
-            //设置操作栏背景
-            actionBar.setBackgroundDrawable(new ColorDrawable(ResourceUtils.getColor(R.color.actionbar_background)));
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode ==KeyEvent.KEYCODE_BACK ){
+            finish();
+            overridePendingTransition(R.anim.activity_exit_left, R.anim.activity_exit_right);
+            return true;
         }
+        return super.onKeyDown(keyCode, event);
     }
-
 }

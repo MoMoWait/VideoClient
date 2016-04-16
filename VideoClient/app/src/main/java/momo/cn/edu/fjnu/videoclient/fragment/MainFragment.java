@@ -1,6 +1,5 @@
 package momo.cn.edu.fjnu.videoclient.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,7 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import org.json.JSONObject;
 import org.xutils.view.annotation.ContentView;
@@ -26,18 +27,20 @@ import java.util.UUID;
 
 import momo.cn.edu.fjnu.androidutils.base.BaseFragment;
 import momo.cn.edu.fjnu.androidutils.utils.BitmapUtils;
+import momo.cn.edu.fjnu.androidutils.utils.DeviceInfoUtils;
 import momo.cn.edu.fjnu.androidutils.utils.DialogUtils;
 import momo.cn.edu.fjnu.androidutils.utils.ResourceUtils;
 import momo.cn.edu.fjnu.androidutils.utils.StorageUtils;
 import momo.cn.edu.fjnu.videoclient.R;
 import momo.cn.edu.fjnu.videoclient.activity.AllUsersActivity;
-import momo.cn.edu.fjnu.videoclient.activity.VideoRecorderActivity;
+import momo.cn.edu.fjnu.videoclient.activity.PhotoRtMonitorActivity;
 import momo.cn.edu.fjnu.videoclient.activity.VideoRtUploadActivity;
 import momo.cn.edu.fjnu.videoclient.data.AppConst;
 import momo.cn.edu.fjnu.videoclient.data.SharedKeys;
 import momo.cn.edu.fjnu.videoclient.exception.AppException;
 import momo.cn.edu.fjnu.videoclient.model.net.FileUploadTask;
 import momo.cn.edu.fjnu.videoclient.service.LocationService;
+import momo.cn.edu.fjnu.videoclient.view.PersonDataView;
 
 /**
  * 主目录页面
@@ -66,15 +69,19 @@ public class MainFragment extends BaseFragment{
     private Button mBtnVideoRtMonitor;
 
     /**拍照上传按钮*/
-    @ViewInject(R.id.btn_photo_capture_upload)
-    private Button mBtnPhtotoCapture;
+    @ViewInject(R.id.btn_photo_rt_upload)
+    private Button mBtnPhotoRtUpload;
 
     /**视频录制上传按钮*/
-    @ViewInject(R.id.btn_video_recorder_upload)
-    private Button mBtnVideoRecorder;
+    @ViewInject(R.id.btn_photo_rt_monitor)
+    private Button mBtnPhotoRtMonitor;
 
     /**图片存储目录*/
     private String mPhotoRawName;
+
+    private SlidingMenu mSlidMenu;
+
+    private PersonDataView mPersonDataView;
 
     @Nullable
     @Override
@@ -84,13 +91,39 @@ public class MainFragment extends BaseFragment{
 
     @Override
     public void initView() {
-        mImgBack.setVisibility(View.GONE);
+        AQuery imgHeadQuery = new AQuery(mImgBack);
+        try {
+            JSONObject userObject = new JSONObject(StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USER_INFO));
+            imgHeadQuery.image(userObject.getString("head_photo"));
+        }catch (Exception e){
+
+        }
         mTextOption.setVisibility(View.GONE);
         //设置标题
         mTextTitle.setText(ResourceUtils.getString(R.string.main_menu));
-        //普通用户,隐藏监控按钮
-        if(StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USER_TYPE).equals("" + AppConst.UserType.NORMAL))
+        String currUserInfo = StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USER_INFO);
+        int userType = 1;
+        try{
+            JSONObject userObject = new JSONObject(currUserInfo);
+            userType = userObject.getInt("type");
+        }catch (Exception e){
+
+        }
+        if (userType == AppConst.UserType.NORMAL){
+            //隐藏监控按钮
             mBtnVideoRtMonitor.setVisibility(View.GONE);
+            mBtnPhotoRtMonitor.setVisibility(View.GONE);
+        }
+
+        mSlidMenu = new SlidingMenu(getContext());
+        mSlidMenu.setMode(SlidingMenu.LEFT);
+        mSlidMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        mSlidMenu.setShadowWidth(0);
+        mSlidMenu.setBehindOffset(DeviceInfoUtils.getScreenWidth(getContext()) / 5);
+        mSlidMenu.setFadeDegree(0.35f);
+        mSlidMenu.attachToActivity(getActivity(), SlidingMenu.SLIDING_CONTENT);
+        mPersonDataView = new PersonDataView(getContext());
+        mSlidMenu.setMenu(mPersonDataView);
     }
 
     @Override
@@ -106,6 +139,7 @@ public class MainFragment extends BaseFragment{
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), VideoRtUploadActivity.class);
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.activity_enter_left, R.anim.activity_enter_right);
             }
         });
 
@@ -115,15 +149,16 @@ public class MainFragment extends BaseFragment{
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), AllUsersActivity.class);
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.activity_enter_left, R.anim.activity_enter_right);
             }
         });
 
         //拍照上传按钮监听事件
-        mBtnPhtotoCapture.setOnClickListener(new View.OnClickListener(){
+        mBtnPhotoRtUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 File dirFile = new File(AppConst.PHOTO_DIRECTORY);
-                if(!dirFile.exists())
+                if (!dirFile.exists())
                     dirFile.mkdirs();
                 mPhotoRawName = UUID.randomUUID().toString() + ".jpg";
                 File photoFile = new File(dirFile, mPhotoRawName);
@@ -131,15 +166,39 @@ public class MainFragment extends BaseFragment{
             }
         });
 
-        //视频录制按钮上传事件
-        mBtnVideoRecorder.setOnClickListener(new View.OnClickListener(){
+        //图片实时监控按钮监听事件
+        mBtnPhotoRtMonitor.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), VideoRecorderActivity.class);
-                startActivityForResult(intent, REQUEST_GET_VIDEO);
+                Intent intent = new Intent(getContext(), PhotoRtMonitorActivity.class);
+                startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.activity_enter_left, R.anim.activity_enter_right);
             }
         });
 
+        mSlidMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
+            @Override
+            public void onOpen() {
+                mImgBack.setVisibility(View.GONE);
+                //刷新页面
+              //  mPersonDataView.refreshData();
+            }
+        });
+
+        mSlidMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
+            @Override
+            public void onClose() {
+                mImgBack.setVisibility(View.VISIBLE);
+            }
+        });
+
+        mImgBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mSlidMenu.isMenuShowing())
+                    mSlidMenu.showMenu();
+            }
+        });
     }
 
     /**
@@ -157,10 +216,18 @@ public class MainFragment extends BaseFragment{
         String saveScalePhotoName = UUID.randomUUID().toString() + ".jpg";
         File saveScaleFile = new File(dirFile, saveScalePhotoName);
         //图片的宽和高压缩为原来的一半
-        BitmapUtils.saveScaledBitmap(photoFile.getAbsolutePath(), options.outWidth / 2, options.outHeight / 2 , saveScaleFile.getAbsolutePath(), Bitmap.CompressFormat.JPEG, 80);
+        BitmapUtils.saveScaledBitmap(photoFile.getAbsolutePath(), AppConst.CAMERA_SCALE_WIDTH, AppConst.CAMERA_SCALE_HEIGHT, saveScaleFile.getAbsolutePath(), Bitmap.CompressFormat.JPEG, 80);
         saveScaleFile = new File(dirFile, saveScalePhotoName);
         DialogUtils.showLoadingDialog(getContext(), false);
         AjaxCallback.setTimeout(AppConst.MAX_UPLOAD_PHOTO_TIME);
+        String userId = String.valueOf(-1);
+        String currInfo = StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USER_INFO);
+        try{
+            JSONObject userObject = new JSONObject(currInfo);
+            userId = userObject.getString("id");
+        }catch (Exception e){
+
+        }
         new FileUploadTask(new FileUploadTask.CallBack() {
             @Override
             public void onSuccess(JSONObject jsonObject) {
@@ -175,32 +242,23 @@ public class MainFragment extends BaseFragment{
                 Toast.makeText(getContext(), exception.getErrorMsg(), Toast.LENGTH_SHORT).show();
                 AjaxCallback.setTimeout(AppConst.DEFAULT_UPLOAD_TIME);
             }
-        }).execute(StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USERID), "" + AppConst.FileType.PHOTO, "" + saveScaleFile.length() / 1024,
+        }).execute(userId, "" + AppConst.FileType.PHOTO, "" + saveScaleFile.length() / 1024,
                 saveScaleFile.getAbsolutePath(), "" + LocationService.lng, "" + LocationService.lat, LocationService.address);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_GET_VIDEO && resultCode == Activity.RESULT_OK){
-            String videoPath = data.getStringExtra(AppConst.VIDEO_PATH);
-            File videoFile = new File(videoPath);
-            new FileUploadTask(new FileUploadTask.CallBack() {
-                @Override
-                public void onSuccess(JSONObject jsonObject) {
-                    DialogUtils.closeLoadingDialog();
-                    Toast.makeText(getContext(), "视频上传成功", Toast.LENGTH_SHORT).show();
-                    AjaxCallback.setTimeout(AppConst.DEFAULT_UPLOAD_TIME);
-                }
 
-                @Override
-                public void onFailed(AppException exception) {
-                    DialogUtils.closeLoadingDialog();
-                    Toast.makeText(getContext(), exception.getErrorMsg(), Toast.LENGTH_SHORT).show();
-                    AjaxCallback.setTimeout(AppConst.DEFAULT_UPLOAD_TIME);
-                }
-            }).execute(StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USERID), "" + AppConst.FileType.VIDEO, "" + videoFile.length() / 1024,
-                    videoFile.getAbsolutePath(), "" + LocationService.lng, "" +LocationService.lat, LocationService.address);
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPersonDataView.refreshData();
+        String userInfo =StorageUtils.getDataFromSharedPreference(SharedKeys.CURR_USER_INFO);
+        try{
+            JSONObject userObject = new JSONObject(userInfo);
+            AQuery aQuery = new AQuery(mImgBack);
+            aQuery.image(userObject.getString("head_photo"));
+
+        }catch (Exception e){
+
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 }

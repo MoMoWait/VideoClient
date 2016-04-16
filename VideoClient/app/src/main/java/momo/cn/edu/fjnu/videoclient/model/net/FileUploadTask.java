@@ -1,6 +1,7 @@
 package momo.cn.edu.fjnu.videoclient.model.net;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -41,9 +42,12 @@ public class FileUploadTask extends AsyncTask<String, Integer, Integer>{
         reqParams.put("lng", params[4]);
         reqParams.put("lat", params[5]);
         reqParams.put("address", params[6]);
+      //  reqParams.put("address", "happy day");
+        Log.i(TAG, "获取的地址:" +params[6]);
         try {
             mJsonResult = NetService.request("FileUploadService", reqParams);
         } catch (AppException e) {
+            Log.i(TAG, "" + e);
             mException = e;
             e.printStackTrace();
             return AppConst.RetResult.FAILED;

@@ -33,5 +33,9 @@ public class SharedKeys {
     public static final String VIDEO_BITRATE = "video_bitrate";
     /**摄像机的分辨率*/
     public static final String CAMERA_SIZES = "camera_sizes";
+    /**当前用户的信息，使用json字符串保存*/
+    public static final String CURR_USER_INFO = "curr_user_info";
+    /**是否自动登录*/
+    public static final String IS_AUTO_LOGIN = "is_auto_login";
 
 }

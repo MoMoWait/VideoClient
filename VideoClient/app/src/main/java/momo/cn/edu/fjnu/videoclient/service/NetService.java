@@ -42,6 +42,7 @@ public class NetService {
             try {
                 JSONObject resultJson = new JSONObject(strResult);
                 JSONObject content = resultJson.getJSONObject("result");
+                Log.i(TAG, "" + content.toString());
                 try {
                     content.get("succ");
                 } catch (Exception e) {
@@ -66,7 +67,7 @@ public class NetService {
             }
 
         }
-        return null;
+        return new JSONObject();
     }
 
 }

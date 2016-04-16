@@ -6,9 +6,12 @@
 
     <ImageView
         android:id="@+id/img_back"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
         android:scaleType="centerInside"
+        android:layout_marginLeft="@dimen/pm_micro"
+        android:layout_marginStart="@dimen/pm_micro"
         android:src="@mipmap/img_back"/>
     <TextView
         android:id="@+id/text_title"
@@ -21,10 +24,13 @@
     <TextView
         android:id="@+id/text_option"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:textSize="@dimen/text_common"
+        android:layout_marginRight="@dimen/pm_common"
+        android:layout_marginEnd="@dimen/pm_common"
+        android:gravity="center_vertical"
+        android:textColor="@color/black"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:textSize="20sp"
-        android:text="@string/login"
-        android:textColor="@color/black"/>
+        android:layout_alignParentEnd="true"
+        android:text="@string/login"/>
 </RelativeLayout>

@@ -113,7 +113,7 @@ public class BitmapUtils {
 	 * @param bitmap  源位图
 	 * @return
 	 */
-	public Bitmap getCroppedBitmap(Bitmap bitmap) {
+	public static Bitmap getCroppedBitmap(Bitmap bitmap) {
 		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(output);
 		final int color = 0xff424242;
@@ -127,4 +127,6 @@ public class BitmapUtils {
 		canvas.drawBitmap(bitmap, rect, rect, paint);
 		return output;
 	}
+
+
 }

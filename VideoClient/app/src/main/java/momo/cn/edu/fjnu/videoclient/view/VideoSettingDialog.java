@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -94,6 +95,28 @@ public class VideoSettingDialog extends BaseDialog{
                 dismiss();
             }
         });
+
+        mSpnVideoSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int w = Integer.parseInt(parent.getAdapter().getItem(position).toString().split("\\*")[0]);
+                int h = Integer.parseInt(parent.getAdapter().getItem(position).toString().split("\\*")[1]);
+                int t = 2560000 / (w * h);
+                if (t > 25)
+                    t = 25;
+                else if (t < 8)
+                    t = 8;
+                int b = w * h * t / 8;
+                mEdtVideoFrame.setText("" + t);
+                mEdtVideoBitrate.setText("" + b);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         mBtnOk.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -12,12 +12,14 @@
     <EditText
         android:id="@+id/edt_video_frame_rate"
         style="@style/common_edit"
+        android:focusable="false"
         android:layout_width="match_parent"
         android:hint="@string/input_video_frame_rate"/>
 
     <EditText
         android:id="@+id/edt_video_bitrate"
         style="@style/common_edit"
+        android:focusable="false"
         android:layout_width="match_parent"
         android:hint="@string/input_video_bitrate"/>
 

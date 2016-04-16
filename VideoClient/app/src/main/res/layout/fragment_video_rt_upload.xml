@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/video"
-                android:src="@mipmap/ic_settings_holo_light" />
+                android:src="@mipmap/img_video_server" />
 
         </LinearLayout>
     </FrameLayout>

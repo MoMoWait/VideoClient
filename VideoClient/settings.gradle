@@ -1,1 +1,1 @@
-include ':app', ':androidutils', ':vlclib'
+include ':app', ':androidutils', ':vlclib', ':slidingmenu'

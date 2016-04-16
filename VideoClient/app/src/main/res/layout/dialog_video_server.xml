@@ -7,12 +7,14 @@
     <EditText
         android:id="@+id/edt_server_ip"
         style="@style/common_edit"
+        android:text="120.24.210.186"
         android:layout_width="match_parent"
         android:hint="@string/input_server_ip"/>
 
     <EditText
         android:id="@+id/edt_user_name"
         style="@style/common_edit"
+        android:text="GaoFei"
         android:layout_width="match_parent"
         android:hint="@string/input_user_name"/>
 
@@ -20,6 +22,7 @@
         android:id="@+id/edt_password"
         style="@style/common_edit"
         android:inputType="textPassword"
+        android:text="gf6548914"
         android:layout_width="match_parent"
         android:hint="@string/input_password"/>
 

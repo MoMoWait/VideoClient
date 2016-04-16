@@ -10,6 +10,7 @@ import org.xutils.x;
 
 import java.io.File;
 
+import cn.jpush.android.api.JPushInterface;
 import momo.cn.edu.fjnu.androidutils.base.BaseApplication;
 import momo.cn.edu.fjnu.videoclient.data.AppConst;
 
@@ -31,6 +32,9 @@ public class VideoApplication extends BaseApplication {
      * 初始化APP
      */
     public void initApp() {
+        x.Ext.init(this);
+        JPushInterface.setDebugMode(true);
+        JPushInterface.init(this);
         initAquery();
         initDB();
     }
@@ -45,7 +49,7 @@ public class VideoApplication extends BaseApplication {
                     @Override
                     public void onDbOpened(DbManager db) {
                         // 开启WAL, 对写入加速提升巨大
-                        db.getDatabase().enableWriteAheadLogging();
+                        //db.getDatabase().enableWriteAheadLogging();
                     }
                 }).setDbUpgradeListener(null);
         if (null == mDBManager)
